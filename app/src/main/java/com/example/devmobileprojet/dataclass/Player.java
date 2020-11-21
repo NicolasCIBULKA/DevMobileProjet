@@ -1,9 +1,12 @@
 package com.example.devmobileprojet.dataclass;
 
+import android.media.MediaPlayer;
+
 public class Player {
     // Attributs
 
     private boolean playing;
+    private MediaPlayer player;
     private  Music currentMusic;
     private MusicList currentList;
     private Status playerStatus;
@@ -14,7 +17,8 @@ public class Player {
 
     // Constructor
 
-    public Player(){
+    public Player(MediaPlayer player){
+        this.player = player;
         this.playing = false;
         this.currentMusic = null;
         this.currentList = new MusicList();

@@ -5,14 +5,15 @@ public class Playlist extends MusicList {
 
     private String playlistname;
     private String description;
-
+    private int idPlaylist;
     // ---------------------
     // Methods
     // ---------------------
 
     // Constructor
 
-    public Playlist(){
+    public Playlist(int idPlaylist){
+        this.idPlaylist = idPlaylist;
         this.playlistname = "";
         this.description = "";
     }
@@ -33,5 +34,13 @@ public class Playlist extends MusicList {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getIdPlaylist() {
+        return idPlaylist;
+    }
+
+    public void setIdPlaylist(int idPlaylist) {
+        this.idPlaylist = idPlaylist;
     }
 }

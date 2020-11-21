@@ -6,7 +6,7 @@ package com.example.devmobileprojet.dataclass;
  */
 public class Music {
     // Attributs
-
+    private int idMusic;
     private String position;
     private int size;
     private float length;
@@ -17,7 +17,8 @@ public class Music {
     // ---------------------
 
     // Construstor
-    public Music(String position, int size, float length, String name, String artist){
+    public Music(int idMusic, String position, int size, float length, String name, String artist){
+        this.idMusic = idMusic;
         this.position = position;
         this.size = size;
         this.length = length;
@@ -26,6 +27,14 @@ public class Music {
     }
 
     // getters setters
+
+    public int getIdMusic() {
+        return idMusic;
+    }
+
+    public void setIdMusic(int idMusic) {
+        this.idMusic = idMusic;
+    }
 
     public String getPosition() {
         return position;

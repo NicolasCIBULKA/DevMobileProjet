@@ -8,7 +8,7 @@ public class Music {
     // Attributs
     private int idMusic;
     private String position;
-    private int size;
+    private long size;
     private float length;
     private String name;
     private String artist;
@@ -17,7 +17,7 @@ public class Music {
     // ---------------------
 
     // Construstor
-    public Music(int idMusic, String position, int size, float length, String name, String artist){
+    public Music(int idMusic, String position, long size, float length, String name, String artist){
         this.idMusic = idMusic;
         this.position = position;
         this.size = size;
@@ -25,6 +25,7 @@ public class Music {
         this.name = name;
         this.artist = artist;
     }
+
 
     // getters setters
 
@@ -44,7 +45,7 @@ public class Music {
         this.position = position;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 

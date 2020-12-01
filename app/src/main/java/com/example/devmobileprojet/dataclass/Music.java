@@ -9,7 +9,7 @@ public class Music {
     private int idMusic;
     private String position;
     private long size;
-    private float length;
+    private int length;
     private String name;
     private String artist;
     // ---------------------
@@ -17,7 +17,7 @@ public class Music {
     // ---------------------
 
     // Construstor
-    public Music(int idMusic, String position, long size, float length, String name, String artist){
+    public Music(int idMusic, String position, long size, int length, String name, String artist){
         this.idMusic = idMusic;
         this.position = position;
         this.size = size;
@@ -53,11 +53,11 @@ public class Music {
         this.size = size;
     }
 
-    public float getLength() {
+    public int getLength() {
         return length;
     }
 
-    public void setLength(float length) {
+    public void setLength(int length) {
         this.length = length;
     }
 

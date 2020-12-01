@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import androidx.annotation.Nullable;
 
 import com.example.devmobileprojet.dataclass.Music;
+import com.example.devmobileprojet.dataclass.MusicList;
 import com.example.devmobileprojet.dataclass.Playlist;
 
 import java.io.File;
@@ -24,7 +25,7 @@ import java.nio.file.Files;
 public class DataBaseHandler extends SQLiteOpenHelper {
 
     // Attributs
-
+    private static final String FILE_PATH = "/storage/sdcard/music";
     // Database version
     private static final int DATABASE_VERSION = 1;
 
@@ -103,7 +104,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             File f = new File(cursor.getString(1));
             // si non existence
             if(!f.exists()){
-                // On supprime de la BD
+                // On supprime de la bd
                 String DEL_MUSIC = "DELETE FROM " + TABLE_MUSIC + "WHERE "+ KEY_IDMUSIC + " = " + cursor.getString(0);
                 db.execSQL(DEL_MUSIC);
             }
@@ -111,7 +112,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         }while (cursor.moveToNext());
         cursor.close();
         // verifier que les musiques du dossier sont présentes dans la BD
-        String FilesPosition = ""; // TODO TO DEFINE
+        String FilesPosition = FILE_PATH;
         File folder = new File(FilesPosition);
         File[] listOfMusic = folder.listFiles();
         for (int i = 0; i < listOfMusic.length ; i++) {
@@ -125,7 +126,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                 MediaMetadataRetriever media = new MediaMetadataRetriever();
                 media.setDataSource(position);
                 String length = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                long duration = Long.parseLong(length);
+                int duration = Integer.parseInt(length);
                 String name = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String artist = media.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
                 Music music = new Music(0, position, size, duration, name, artist);
@@ -152,7 +153,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
     }
-
+    
     // Add a Music
     public void registerMusic(Music music){
         SQLiteDatabase bd = this.getWritableDatabase();
@@ -181,7 +182,56 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             bd.execSQL(ADD);
         }
         bd.close();
+    }
 
+    // TODO
+    public MusicList getMusicList(){
+        MusicList ml = new MusicList();
+        SQLiteDatabase bd = this.getWritableDatabase();
+        String GETMUSIC = "SELECT * FROM " + TABLE_MUSIC ;
+        Cursor cursor = bd.rawQuery(GETMUSIC, null);
+        do {
+            // create Music with elements given by request
+            int idmusic = cursor.getInt(0);
+            String position = cursor.getString(1);
+            long size = cursor.getLong(2);
+            int length = cursor.getInt(3);
+            String name = cursor.getString(4);
+            String artist = cursor.getString(5);
+            Music m = new Music(idmusic, position, size, length, name, artist);
+            // add Music to MusicList
+            ml.getMusiclist().add(m);
+            // increment number of Music
+            ml.setMusicnumber(ml.getMusicnumber()+1);
+            // Increase length of playing time
+            ml.setLength(ml.getLength() + m.getLength());
+        }while (cursor.moveToNext());
+        return ml;
+    }
+
+    public MusicList getPlaylist(int idplaylist){
+        MusicList ml = new MusicList();
+        SQLiteDatabase bd = this.getWritableDatabase();
+        String GETMUSIC = "SELECT * FROM " + TABLE_MUSIC + " WHERE " + KEY_IDMUSIC + "= (SELECT "+KEY_IDMUSIC
+                +"FROM "+TABLE_PLAYLIST+" WHERE "+KEY_IDPLAYLIST+" = "+idplaylist+")";
+        Cursor cursor = bd.rawQuery(GETMUSIC, null);
+        do {
+            // create Music with elements given by request
+            int idmusic = cursor.getInt(0);
+            String position = cursor.getString(1);
+            long size = cursor.getLong(2);
+            int length = cursor.getInt(3);
+            String name = cursor.getString(4);
+            String artist = cursor.getString(5);
+            Music m = new Music(idmusic, position, size, length, name, artist);
+            // add Music to MusicList
+            ml.getMusiclist().add(m);
+            // increment number of Music
+            ml.setMusicnumber(ml.getMusicnumber()+1);
+            // Increase length of playing time
+            ml.setLength(ml.getLength() + m.getLength());
+        }while (cursor.moveToNext());
+        return ml;
     }
 
     // Clear the table
@@ -190,7 +240,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + TABLE_HAVE);
         db.execSQL("DELETE FROM " + TABLE_PLAYLIST);
         db.execSQL("DELETE FROM " + TABLE_MUSIC);
-
         db.close();
     }
 }

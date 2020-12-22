@@ -65,6 +65,8 @@ public class PlayingService extends Service {
         this.musiclist=musiclist;
     }
 
+
+
     @Override
     public IBinder onBind(Intent intent) {
         return musicBind;
@@ -88,5 +90,47 @@ public class PlayingService extends Service {
         this.musicposition = musicposition;
     }
 
+    public MediaPlayer getPlayer() {
+        return player;
+    }
 
+    public void setPlayer(MediaPlayer player) {
+        this.player = player;
+    }
+
+    public ArrayList<Music> getMusiclist() {
+        return musiclist;
+    }
+
+    public void setMusiclist(ArrayList<Music> musiclist) {
+        this.musiclist = musiclist;
+    }
+
+    public int getMusicposition() {
+        return player.getCurrentPosition();
+    }
+
+    public int getDuration(){
+        return player.getDuration();
+    }
+
+    public boolean isPlaying(){
+        return player.isPlaying();
+    }
+
+    public void pausePlayer(){
+        player.pause();
+    }
+
+    public void startPlayer(){
+        player.start();
+    }
+
+    public void seek(int posn){
+        player.seekTo(posn);
+    }
+
+    public IBinder getMusicBind() {
+        return musicBind;
+    }
 }

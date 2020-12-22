@@ -14,14 +14,22 @@ import android.util.Log;
 
 import com.example.devmobileprojet.dataclass.Music;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class PlayingService extends Service {
-    // TODO TODO TODO
+
+    // Attributs
+
     private MediaPlayer player;
     private ArrayList<Music> musiclist;
     private int musicposition;
     private final IBinder musicBind = new MusicBinder();
+    private boolean shuffle=false;
+    private Random rand;
+
+    // Methods
+
     public PlayingService() {
 
     }
@@ -39,7 +47,7 @@ public class PlayingService extends Service {
         mp.start();
     }
 
-    public void playSong(){
+    public void playMusic(){
         player.reset();
         Music playMusic = musiclist.get(musicposition);
         long currentmusic = playMusic.getId();
@@ -51,6 +59,52 @@ public class PlayingService extends Service {
             Log.e("MUSIC SERVICE", "Erreur dans la source de media", e);
         }
         player.prepareAsync();
+    }
+
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        mp.reset();
+        return false;
+    }
+
+    public void onCompletion(MediaPlayer mp) {
+        if(player.getCurrentPosition() < 0){
+            mp.reset();
+            playNext();
+        }
+    }
+
+    public void setShuffle(){
+        if(shuffle){
+            shuffle = false;
+        }
+        else {
+            shuffle = true;
+        }
+    }
+
+    public void playPrev(){
+        musicposition--;
+        if(musicposition == 0){
+            musicposition = musiclist.size()-1;
+        }
+        playMusic();
+    }
+
+    public void playNext(){
+        if(shuffle){
+            int newmusic = musicposition;
+            while(newmusic == musicposition){
+                newmusic = rand.nextInt(musiclist.size());
+            }
+            musicposition = newmusic;
+        }
+        else{
+            musicposition++;
+            if(musicposition == musiclist.size()){
+                musicposition = 0;
+            }
+        }
+        playMusic();
     }
 
     public void initMusicPlayer(){

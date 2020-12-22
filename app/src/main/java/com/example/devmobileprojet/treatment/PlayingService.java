@@ -39,13 +39,6 @@ public class PlayingService extends Service {
         mp.start();
     }
 
-    @Override
-    public void onDestroy() {
-        stopService(playIntent);
-        musicSrv=null;
-        super.onDestroy();
-    }
-
     public void playSong(){
         player.reset();
         Music playMusic = musiclist.get(musicposition);

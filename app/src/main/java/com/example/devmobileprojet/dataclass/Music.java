@@ -6,67 +6,37 @@ package com.example.devmobileprojet.dataclass;
  */
 public class Music {
     // Attributs
-    private int idMusic;
-    private String position;
-    private long size;
-    private int length;
-    private String name;
+    private long id;
+    private String title;
     private String artist;
+    private int duration;
+
     // ---------------------
     // Methods
     // ---------------------
 
     // Construstor
-    public Music(int idMusic, String position, long size, int length, String name, String artist){
-        this.idMusic = idMusic;
-        this.position = position;
-        this.size = size;
-        this.length = length;
-        this.name = name;
+    public Music(long id, String title, String artist){
+        this.id = id;
+        this.title = title;
         this.artist = artist;
     }
 
-
     // getters setters
-
-    public int getIdMusic() {
-        return idMusic;
+    public long getId() {
+        return id;
     }
 
-    public void setIdMusic(int idMusic) {
-        this.idMusic = idMusic;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public String getPosition() {
-        return position;
+    public String getTitle() {
+        return title;
     }
 
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getArtist() {
@@ -77,5 +47,12 @@ public class Music {
         this.artist = artist;
     }
 
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 
 }

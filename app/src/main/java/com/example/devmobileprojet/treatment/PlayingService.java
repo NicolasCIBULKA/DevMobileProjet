@@ -119,7 +119,9 @@ public class PlayingService extends Service {
         this.musiclist=musiclist;
     }
 
-
+    public void setMusic(int musicIndex){
+        musicposition=musicIndex;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -134,7 +136,7 @@ public class PlayingService extends Service {
     }
 
     public class MusicBinder extends Binder {
-        PlayingService getService() {
+        public PlayingService getService() {
             return PlayingService.this;
         }
     }

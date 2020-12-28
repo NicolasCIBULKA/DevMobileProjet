@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.example.devmobileprojet.R;
 
 import java.util.ArrayList;
@@ -40,18 +42,21 @@ public class MusicAdapter extends BaseAdapter {
         return 0;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LinearLayout MusicLayout = (LinearLayout)MusicInflater.inflate(
+        ConstraintLayout MusicLayout = (ConstraintLayout)MusicInflater.inflate(
                 R.layout.song, parent, false
         );
-        //TextView MusicView = (TextView)MusicLayout.findViewById(); // TODO
-        //TextView ArtistView = (TextView)MusicLayout.findViewById(); // TODO
+        TextView MusicView = (TextView)MusicLayout.findViewById(R.id.song_title);
+        TextView ArtistView = (TextView)MusicLayout.findViewById(R.id.song_artist);
         Music currentMusic = MusicList.get(position);
-        //MusicView.setText(currentMusic.getTitle());
-        //MusicView.setText(currentMusic.getArtist());
+        MusicView.setText(currentMusic.getTitle());
+        MusicView.setText(currentMusic.getArtist());
 
         MusicLayout.getTag(position);
         return MusicLayout;
     }
+
+
 }

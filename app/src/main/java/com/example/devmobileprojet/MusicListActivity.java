@@ -1,19 +1,25 @@
 package com.example.devmobileprojet;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -23,43 +29,70 @@ import com.example.devmobileprojet.treatment.PlayingService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
-/*
-    Activity that display the list of music and playlists
-    FRONT TODO
- */
-public class MusicList extends AppCompatActivity {
+public class MusicListActivity extends AppCompatActivity {
+    private static final Object REQUEST_CODE = 1;
+
     // Attributs
-
+    public static String TAG = "MusicListActivity";
     private ArrayList<Music> musicList;
+    private ArrayList<String> musicnamelist;
     private ListView musicView;
     private PlayingService musicSrv;
     private Intent playIntent;
     private boolean musicBound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_musicplayer);
+        setContentView(R.layout.activity_music_list);
 
-       // musicView = (ListView)findViewById(R.id.);// mettre l'id de la list du front
+        musicView = (ListView)findViewById(R.id.song_list);// mettre l'id de la list du front
         musicList = new ArrayList<Music>();
+        musicnamelist = new ArrayList<String>();
+        if(ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED){
+            getMusicList();
 
-        getMusicList();
-
-        Collections.sort(
-                musicList, new Comparator<Music>() {
-                    @Override
-                    public int compare(Music a, Music b) {
-                        return a.getTitle().compareTo(b.getTitle());
+            Collections.sort(
+                    musicList, new Comparator<Music>() {
+                        @Override
+                        public int compare(Music a, Music b) {
+                            return a.getTitle().compareTo(b.getTitle());
+                        }
                     }
-                }
-        );
-        musicView = findViewById(R.id.song_list);
-        musicView.setAdapter(new ArrayAdapter<>(MusicList.this, android.R.layout.simple_list_item_1, musicList));
+            );
+
+            musicView = findViewById(R.id.song_list);
+            musicView.setAdapter(new ArrayAdapter<>(MusicListActivity.this, android.R.layout.simple_list_item_1,musicnamelist ));
+            //MusicAdapter songAdt = new MusicAdapter(this, musicList);
+            //musicView.setAdapter(songAdt);
+        }
+        else{
+            ActivityCompat.requestPermissions(this,
+                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                    1);
+
+            getMusicList();
+
+            Collections.sort(
+                    musicList, new Comparator<Music>() {
+                        @Override
+                        public int compare(Music a, Music b) {
+                            return a.getTitle().compareTo(b.getTitle());
+                        }
+                    }
+            );
+
+            musicView = findViewById(R.id.song_list);
+            musicView.setAdapter(new ArrayAdapter<>(MusicListActivity.this, android.R.layout.simple_list_item_1,musicnamelist ));
+            //MusicAdapter songAdt = new MusicAdapter(this, musicList);
+            //musicView.setAdapter(songAdt);
+        }
+
 
 
     }
@@ -91,16 +124,21 @@ public class MusicList extends AppCompatActivity {
         }
     };
 
-    public void songPicked(View view) throws IOException {
+    public void songPicked(View view){
         musicSrv.setMusic(Integer.parseInt(view.getTag().toString()));
         // TODO
-        musicSrv.playMusic();
+        Log.d(TAG, "songPicked: ");
+        try {
+            musicSrv.playMusic();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         //menu item selected
-       /* switch (item.getItemId()) {
+        /*switch (item.getItemId()) {
             case R.id.action_shuffle:
                 //shuffle
                 break;
@@ -121,14 +159,36 @@ public class MusicList extends AppCompatActivity {
             int columnTitle = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int columnID = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int columnArtist = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-
             do {
                 long currentid = musicCursor.getLong(columnID);
                 String currentTitle = musicCursor.getString(columnTitle);
                 String currentArtist = musicCursor.getString(columnArtist);
                 musicList.add(new Music(currentid, currentTitle, currentArtist));
+                musicnamelist.add(currentTitle);
             }while(musicCursor.moveToNext());
+
         }
+        // Handle onClick event
+        musicView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                //musicSrv.setMusic(Integer.parseInt(view.getTag().toString()));
+                Log.d(TAG, "songPicked: ");
+                //musicSrv.playMusic();
+                //Music wantedMusic = musicList.get(position-1);
+                musicSrv.setMusic(position);
+                try {
+                    musicSrv.playMusic();
+                    Intent i = new Intent(MusicListActivity.this, Musicplayer.class);
+                    startActivity(i);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
     }
     // Functions todo
     /*

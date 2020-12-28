@@ -13,14 +13,21 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.DevMobileProjet">
-        <activity android:name=".Musicplayer"></activity>
-        <activity android:name=".MusicList" />
+        android:theme="@style/Theme.DevMobileProjet"
+        >
+        <activity android:name=".MusicListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Musicplayer" />
 
         <service
             android:name=".treatment.PlayingService"
             android:enabled="true"
             android:exported="true" />
+
     </application>
 
 </manifest>

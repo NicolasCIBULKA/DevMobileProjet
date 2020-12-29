@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class PlayingService extends Service {
+public class PlayingService extends Service implements
+        MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
+        MediaPlayer.OnCompletionListener {
     private static final String TAG = "PLAYING SERVICE";
 
     // Attributs
@@ -125,10 +127,14 @@ public class PlayingService extends Service {
         return false;
     }
 
-    public void onCompletion(MediaPlayer mp) throws IOException {
+    public void onCompletion(MediaPlayer mp) {
         if(player.getCurrentPosition() < 0){
             mp.reset();
-            playNext();
+            try {
+                playNext();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

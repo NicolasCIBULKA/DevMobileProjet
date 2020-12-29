@@ -177,9 +177,11 @@ public class MusicListActivity extends AppCompatActivity {
                 //musicSrv.playMusic();
                 //Music wantedMusic = musicList.get(position-1);
                 musicSrv.setMusic(position);
+
                 try {
                     musicSrv.playMusic();
                     Intent i = new Intent(MusicListActivity.this, Musicplayer.class);
+                    i.putExtra("ServiceIntent", playIntent);
                     startActivity(i);
 
                 } catch (IOException e) {
@@ -189,6 +191,11 @@ public class MusicListActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void gotoSettings(View view){
+        Intent i = new Intent(MusicListActivity.this, Settings.class);
+        startActivity(i);
     }
     // Functions todo
     /*

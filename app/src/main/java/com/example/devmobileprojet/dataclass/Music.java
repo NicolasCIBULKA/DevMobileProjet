@@ -16,11 +16,12 @@ public class Music {
     // ---------------------
 
     // Construstor
-    public Music(long id, String title, String artist, String position){
+    public Music(long id, String title, String artist, String position, String duration){
         this.id = id;
         this.title = title;
         this.artist = artist;
         this.position = position;
+        this.duration = duration;
     }
 
     public String getPosition() {

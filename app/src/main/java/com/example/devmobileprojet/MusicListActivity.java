@@ -184,13 +184,15 @@ public class MusicListActivity extends AppCompatActivity  {
             int columnTitle = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int columnID = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int columnArtist = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int duration = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
             int columnPosition = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
             while(musicCursor.moveToNext()){
                 long currentid = musicCursor.getLong(columnID);
+                String currentDuration = musicCursor.getString(duration);
                 String currentTitle = musicCursor.getString(columnTitle);
                 String currentArtist = musicCursor.getString(columnArtist);
                 String currentPosition = musicCursor.getString(columnPosition);
-                musicList.add(new Music(currentid, currentTitle, currentArtist, currentPosition));
+                musicList.add(new Music(currentid, currentTitle, currentArtist, currentPosition, currentDuration));
                 musicnamelist.add(currentTitle);
             }
             Log.d(TAG, "getMusicList: size of MusicList in getMuiscList: " + musicList.size());

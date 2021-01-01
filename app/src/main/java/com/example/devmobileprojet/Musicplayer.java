@@ -63,7 +63,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer);
-        musicList = MusicListActivity.musicList;
+        musicList = musicList;
         getSupportActionBar().hide();
 
         // Initialisation of the Activity
@@ -136,8 +136,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     }
 
     private void initViews() {
-        song_name = findViewById(R.id.song_title);
-        artist_name = findViewById(R.id.song_artist);
+        song_name = findViewById(R.id.titleMusic);
+        artist_name = findViewById(R.id.artist);
         duration_played = findViewById(R.id.currentduration);
         duration_total = findViewById(R.id.totalduration);
         nextBtn = findViewById(R.id.nextBtn);
@@ -366,6 +366,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     private void metaData(Uri uri){
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri.toString());
+        Log.d(TAG, "metaData: size of list"+ musicList.size());
+        Log.d(TAG, "metaData: "+ musicList.get(position).getPosition());
         int durationtotal = Integer.parseInt(musicList.get(position).getDuration()) / 1000;
         duration_total.setText(formattedTime(durationtotal));
 
@@ -379,6 +381,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         if(musicSrv == null){
             Log.d(TAG, "onServiceConnected: service null - " + musicSrv.getDuration());
         }
+        Log.d(TAG, "onServiceConnected: "+ musicList.get(position).getTitle());
         Log.d(TAG, "onServiceConnected: Service Connected");
         seekbar.setMax(musicSrv.getDuration() / 1000);
         metaData(uri);

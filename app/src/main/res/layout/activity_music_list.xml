@@ -26,6 +26,6 @@
         android:onClick="gotoSettings"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/end" />
+        app:srcCompat="@drawable/ic_baseline_settings" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

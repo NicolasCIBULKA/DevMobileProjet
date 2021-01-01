@@ -46,9 +46,7 @@ public class MusicList extends AppCompatActivity {
         setContentView(R.layout.activity_musicplayer);
 
        // musicView = (ListView)findViewById(R.id.);// mettre l'id de la list du front
-        musicList = new ArrayList<Music>();
 
-        getMusicList();
 
         Collections.sort(
                 musicList, new Comparator<Music>() {
@@ -67,35 +65,10 @@ public class MusicList extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(playIntent==null){
-            playIntent = new Intent(this, PlayingService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-        }
+
     }
 
-    private ServiceConnection musicConnection = new ServiceConnection(){
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            PlayingService.MusicBinder binder = (PlayingService.MusicBinder)service;
-            //get service
-            musicSrv = binder.getService();
-            //pass list
-            musicSrv.setList(musicList);
-            musicBound = true;
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
-        }
-    };
-
-    public void songPicked(View view) throws IOException {
-        musicSrv.setMusic(Integer.parseInt(view.getTag().toString()));
-        // TODO
-        musicSrv.playMusic();
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -113,23 +86,6 @@ public class MusicList extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void getMusicList(){
-        ContentResolver musicResolver = getContentResolver();
-        Uri musicURI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicURI, null,null,null,null);
-        if (musicCursor != null && musicCursor.moveToFirst()){
-            int columnTitle = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int columnID = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int columnArtist = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-
-            do {
-                long currentid = musicCursor.getLong(columnID);
-                String currentTitle = musicCursor.getString(columnTitle);
-                String currentArtist = musicCursor.getString(columnArtist);
-                musicList.add(new Music(currentid, currentTitle, currentArtist));
-            }while(musicCursor.moveToNext());
-        }
-    }
     // Functions todo
     /*
     - Give List of Music

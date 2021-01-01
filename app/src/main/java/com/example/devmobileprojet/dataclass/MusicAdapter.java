@@ -1,6 +1,7 @@
 package com.example.devmobileprojet.dataclass;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.example.devmobileprojet.R;
 import java.util.ArrayList;
 
 public class MusicAdapter extends BaseAdapter {
+    private static final String TAG = "Music Adapter";
     // Attributs
 
     private ArrayList<Music> MusicList;
@@ -52,6 +54,7 @@ public class MusicAdapter extends BaseAdapter {
         TextView ArtistView = (TextView)MusicLayout.findViewById(R.id.song_artist);
         Music currentMusic = MusicList.get(position);
         MusicView.setText(currentMusic.getTitle());
+        Log.d(TAG, "getView: title of the music added to list -- " + currentMusic.getTitle() );
         MusicView.setText(currentMusic.getArtist());
 
         MusicLayout.getTag(position);

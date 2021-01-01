@@ -9,17 +9,26 @@ public class Music {
     private long id;
     private String title;
     private String artist;
-    private int duration;
-
+    private String duration;
+    private String position;
     // ---------------------
     // Methods
     // ---------------------
 
     // Construstor
-    public Music(long id, String title, String artist){
+    public Music(long id, String title, String artist, String position){
         this.id = id;
         this.title = title;
         this.artist = artist;
+        this.position = position;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     // getters setters
@@ -47,11 +56,11 @@ public class Music {
         this.artist = artist;
     }
 
-    public int getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 

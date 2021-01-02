@@ -3,12 +3,18 @@ package com.example.devmobileprojet;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +38,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.example.devmobileprojet.MusicListActivity.PREFS;
+
 /*
     Activity that display the current music played
 
@@ -45,10 +53,16 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     SeekBar seekbar;
     ImageView nextBtn, prevBtn;
     FloatingActionButton playpause;
+    View root;
 
     // Service elements
     PlayingService musicSrv;
-
+    SensorManager sensorManager;
+    Sensor lightSensor;
+    SensorEventListener lightEventListener;
+    float maxValue;
+    static boolean existingSensor;
+    static boolean enabledSensor;
     // data structures
     static ArrayList<Music> musicList = new ArrayList<Music>();
     static int position = -1;
@@ -57,6 +71,9 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     // Thread elements
     private Handler handler = new Handler();
     private Thread playThread, previousThread, nextThread;
+    // SharedPreferences
+    static SharedPreferences prefs ;
+    static SharedPreferences.Editor editor;
 
     // methods
     @Override
@@ -65,9 +82,24 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         setContentView(R.layout.activity_musicplayer);
         musicList = musicList;
         getSupportActionBar().hide();
+        prefs = getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
+        enabledSensor = prefs.getBoolean("SensorPref", true);
+        Log.d(TAG, "onCreate: is sensor enabled ?" + enabledSensor);
+        // Initialisation du service du sensor
+        root = findViewById(R.id.root);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        if(lightSensor == null){
+            existingSensor = false;
+            Log.d(TAG, "onCreate: Light sensor does not exists");
+        }
+        else{
+            Log.d(TAG, "onCreate: Light Sensor exists");
+            existingSensor = true;
+        }
+        maxValue = lightSensor.getMaximumRange();
 
         // Initialisation of the Activity
-
         initViews();
         getIntentMethod();
         // Listener of Seekbar
@@ -101,6 +133,37 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                 handler.postDelayed(this, 1000);
             }
         });
+
+        // Listener du sensor
+        lightEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if(enabledSensor) {
+                    float value = event.values[0];
+                    float limitSensor = maxValue / 3;
+                    if (value < limitSensor) {
+                        // going to soft eye mod
+                        root.setBackgroundColor(0xff646767);
+                        song_name.setTextColor(0xffffffff);
+                        artist_name.setTextColor(0xffffffff);
+                        duration_played.setTextColor(0xffffffff);
+                        duration_total.setTextColor(0xffffffff);
+
+                    } else {
+                        root.setBackgroundColor(0xffffffff);
+                        song_name.setTextColor(0xff000000);
+                        artist_name.setTextColor(0xff000000);
+                        duration_played.setTextColor(0xff000000);
+                        duration_total.setTextColor(0xff000000);
+                    }
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        };
 
     }
 
@@ -153,6 +216,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         playThreadBtn();
         nextThreadBtn();
         prevThreadBtn();
+        sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);
+
         super.onResume();
 
     }
@@ -163,6 +228,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     protected void onPause() {
         super.onPause();
         unbindService(this);
+        sensorManager.unregisterListener(lightEventListener);
     }
 
     // Button Threads
@@ -370,8 +436,9 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         Log.d(TAG, "metaData: "+ musicList.get(position).getPosition());
         int durationtotal = Integer.parseInt(musicList.get(position).getDuration()) / 1000;
         duration_total.setText(formattedTime(durationtotal));
-
     }
+
+
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {

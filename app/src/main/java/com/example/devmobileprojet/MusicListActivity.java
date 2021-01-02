@@ -6,11 +6,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -38,19 +40,28 @@ public class MusicListActivity extends AppCompatActivity  {
 
     private static final int REQUEST_CODE = 1;
     private static final String TAG = "Main Activity";
+    public static final String PREFS = "MUSICPREFS";
+
     // Attributs
+    static SharedPreferences prefs ;
+    static SharedPreferences.Editor editor;
     public static ArrayList<Music> musicList;
     private ArrayList<String> musicnamelist;
     private ListView musicView;
     private PlayingService musicSrv;
     private Intent playIntent;
     private boolean musicBound = false;
-
+    boolean sensorpref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
-
+        prefs = getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
+        editor = prefs.edit();
+        if(!prefs.contains("SensorPref")){
+            editor.putBoolean("SensorPref", false);
+        }
+        sensorpref = prefs.getBoolean("SensorPref", false);
         musicView = (ListView)findViewById(R.id.song_list);// mettre l'id de la list du front
         musicList = new ArrayList<Music>();
         musicnamelist = new ArrayList<String>();
@@ -69,50 +80,6 @@ public class MusicListActivity extends AppCompatActivity  {
         //musicView.setAdapter(adapter);
         musicView = findViewById(R.id.song_list);
         musicView.setAdapter(new ArrayAdapter<>(MusicListActivity.this, android.R.layout.simple_list_item_1, musicnamelist));
-        /*if(ContextCompat.checkSelfPermission(
-                this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED){
-            getMusicList();
-
-            Collections.sort(
-                    musicList, new Comparator<Music>() {
-                        @Override
-                        public int compare(Music a, Music b) {
-                            return a.getTitle().compareTo(b.getTitle());
-                        }
-                    }
-            );
-
-            musicView = findViewById(R.id.song_list);
-            musicView.setAdapter(new ArrayAdapter<>(MusicListActivity.this, android.R.layout.simple_list_item_1,musicnamelist ));
-            //MusicAdapter songAdt = new MusicAdapter(this, musicList);
-            //musicView.setAdapter(songAdt);
-        }
-        else{
-            ActivityCompat.requestPermissions(this,
-                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                    1);
-
-            getMusicList();
-
-            Collections.sort(
-                    musicList, new Comparator<Music>() {
-                        @Override
-                        public int compare(Music a, Music b) {
-                            return a.getTitle().compareTo(b.getTitle());
-                        }
-                    }
-            );
-
-            musicView = findViewById(R.id.song_list);
-            musicView.setAdapter(new ArrayAdapter<>(MusicListActivity.this, android.R.layout.simple_list_item_1,musicnamelist ));
-            //MusicAdapter songAdt = new MusicAdapter(this, musicList);
-            //musicView.setAdapter(songAdt);
-        }
-
-         */
-
-
     }
 
 

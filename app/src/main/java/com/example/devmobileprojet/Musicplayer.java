@@ -1,16 +1,9 @@
 package com.example.devmobileprojet;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
 import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,25 +13,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.PersistableBundle;
-import android.provider.MediaStore;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.devmobileprojet.dataclass.ActionPlaying;
 import com.example.devmobileprojet.dataclass.Music;
-import com.example.devmobileprojet.dataclass.MusicController;
 import com.example.devmobileprojet.treatment.PlayingService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.IOException;
 import java.util.ArrayList;
-
-import static com.example.devmobileprojet.MusicListActivity.PREFS;
 
 /*
     Activity that display the current music played
@@ -62,7 +51,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     SensorEventListener lightEventListener;
     float maxValue;
     static boolean existingSensor;
-    static boolean enabledSensor;
+    boolean enableSensor;
     // data structures
     static ArrayList<Music> musicList = new ArrayList<Music>();
     static int position = -1;
@@ -72,8 +61,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     private Handler handler = new Handler();
     private Thread playThread, previousThread, nextThread;
     // SharedPreferences
-    static SharedPreferences prefs ;
-    static SharedPreferences.Editor editor;
+    private SharedPreferences sharedPref = null;
 
     // methods
     @Override
@@ -82,9 +70,10 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         setContentView(R.layout.activity_musicplayer);
         musicList = musicList;
         getSupportActionBar().hide();
-        prefs = getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
-        enabledSensor = prefs.getBoolean("SensorPref", true);
-        Log.d(TAG, "onCreate: is sensor enabled ?" + enabledSensor);
+
+        // SharedPreferences
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        enableSensor = sharedPref.getBoolean("enableSensor", true);
         // Initialisation du service du sensor
         root = findViewById(R.id.root);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -138,7 +127,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         lightEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                if(enabledSensor) {
+                if(enableSensor){
                     float value = event.values[0];
                     float limitSensor = maxValue / 3;
                     if (value < limitSensor) {
@@ -157,7 +146,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                         duration_total.setTextColor(0xff000000);
                     }
                 }
-            }
+
+                }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -217,7 +207,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         nextThreadBtn();
         prevThreadBtn();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);
-
+        enableSensor = sharedPref.getBoolean("enableSensor", true);
         super.onResume();
 
     }
@@ -461,6 +451,10 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     public void onServiceDisconnected(ComponentName name) {
         musicSrv = null;
         Log.d(TAG, "onServiceConnected: Service disonnected");
+    }
+
+    public void gotoPlayer(View view){
+
     }
 
 

@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
@@ -30,6 +31,7 @@ import android.widget.MediaController;
 import com.example.devmobileprojet.dataclass.Music;
 import com.example.devmobileprojet.dataclass.MusicAdapter;
 import com.example.devmobileprojet.treatment.PlayingService;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,28 +42,31 @@ public class MusicListActivity extends AppCompatActivity  {
 
     private static final int REQUEST_CODE = 1;
     private static final String TAG = "Main Activity";
-    public static final String PREFS = "MUSICPREFS";
 
     // Attributs
-    static SharedPreferences prefs ;
-    static SharedPreferences.Editor editor;
+
     public static ArrayList<Music> musicList;
     private ArrayList<String> musicnamelist;
     private ListView musicView;
     private PlayingService musicSrv;
     private Intent playIntent;
     private boolean musicBound = false;
-    boolean sensorpref;
+    FloatingActionButton player;
+    private SharedPreferences sharedPref = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
-        prefs = getSharedPreferences(PREFS, Activity.MODE_PRIVATE);
-        editor = prefs.edit();
-        if(!prefs.contains("SensorPref")){
-            editor.putBoolean("SensorPref", false);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if(!sharedPref.contains("enableSensor")){
+            Log.d(TAG, "onCreate: creation of preference EnableSensor");
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean("enableSensor", true);
+            editor.commit();
+
         }
-        sensorpref = prefs.getBoolean("SensorPref", false);
+        Log.d(TAG, "onCreate: Preference Sensor = " + sharedPref.getBoolean("enableSensor", false));
         musicView = (ListView)findViewById(R.id.song_list);// mettre l'id de la list du front
         musicList = new ArrayList<Music>();
         musicnamelist = new ArrayList<String>();
@@ -192,6 +197,13 @@ public class MusicListActivity extends AppCompatActivity  {
 
         startActivity(i);
     }
+
+    public void gotoPlayer(View view){
+        Intent i = new Intent(MusicListActivity.this, Musicplayer.class);
+        //i.putExtra("")
+        startActivity(i);
+    }
+
     // Functions todo
     /*
     - Give List of Music

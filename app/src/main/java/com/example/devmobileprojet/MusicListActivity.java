@@ -177,40 +177,27 @@ public class MusicListActivity extends AppCompatActivity  {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
                 Log.d(TAG, "songPicked: " + position);
-
                 Music music = musicList.get(position);
                 Log.d(TAG, "songPicked: id of the music : " + position);
                 Log.d(TAG, "songPicked: "+ music.getTitle() + " - " + music.getPosition());
                 Intent i = new Intent(MusicListActivity.this, Musicplayer.class);
                 i.putExtra("position", position);
                 startActivity(i);
-
-
-
             }
         });
-
     }
 
     public void gotoSettings(View view){
         Intent i = new Intent(MusicListActivity.this, Settings.class);
-
         startActivity(i);
     }
 
     public void gotoPlayer(View view){
         Intent i = new Intent(MusicListActivity.this, Musicplayer.class);
-        //i.putExtra("")
+        i.putExtra("position", 1);
         startActivity(i);
     }
 
-    // Functions todo
-    /*
-    - Give List of Music
-    - add to Playlist - go to activity to add playlist
-    - create Playlist - go to activity to create playlist
-    - play the music - go to PlayPause activity & start service
-     */
 
 
 }

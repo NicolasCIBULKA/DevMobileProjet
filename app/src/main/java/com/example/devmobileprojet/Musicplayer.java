@@ -40,7 +40,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     // elements displayed and that have interactions with service
     TextView song_name, artist_name, duration_played, duration_total;
     SeekBar seekbar;
-    ImageView nextBtn, prevBtn;
+    ImageView nextBtn, prevBtn, backtoList;
     FloatingActionButton playpause;
     View root;
 
@@ -71,6 +71,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         musicList = musicList;
         getSupportActionBar().hide();
 
+
+
         // SharedPreferences
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         enableSensor = sharedPref.getBoolean("enableSensor", true);
@@ -90,6 +92,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
 
         // Initialisation of the Activity
         initViews();
+
         getIntentMethod();
         // Listener of Seekbar
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -137,6 +140,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                         artist_name.setTextColor(0xffffffff);
                         duration_played.setTextColor(0xffffffff);
                         duration_total.setTextColor(0xffffffff);
+                        backtoList.setColorFilter(0xffffffff);
 
                     } else {
                         root.setBackgroundColor(0xffffffff);
@@ -144,6 +148,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                         artist_name.setTextColor(0xff000000);
                         duration_played.setTextColor(0xff000000);
                         duration_total.setTextColor(0xff000000);
+                        backtoList.setColorFilter(0xff000000);
                     }
                 }
 
@@ -197,6 +202,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         prevBtn = findViewById(R.id.prevBtn);
         playpause = findViewById(R.id.playpause);
         seekbar = findViewById(R.id.seekBar);
+        backtoList = (ImageView) findViewById(R.id.gotoList);
     }
 
     @Override
@@ -453,8 +459,9 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         Log.d(TAG, "onServiceConnected: Service disonnected");
     }
 
-    public void gotoPlayer(View view){
-
+    public void gotoList(View view){
+        Intent i = new Intent(this, MusicListActivity.class);
+        startActivity(i);
     }
 
 

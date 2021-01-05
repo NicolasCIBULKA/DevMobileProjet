@@ -30,7 +30,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 /*
+
     Activity that display the current music played
+
+    Use the Playing service to play the music in background
 
  */
 public class Musicplayer extends AppCompatActivity implements ActionPlaying, ServiceConnection{
@@ -52,14 +55,17 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     float maxValue;
     static boolean existingSensor;
     boolean enableSensor;
+
     // data structures
     static ArrayList<Music> musicList = new ArrayList<Music>();
     static int position = -1;
     static Uri uri;
     static Uri url;
+
     // Thread elements
     private Handler handler = new Handler();
     private Thread playThread, previousThread, nextThread;
+
     // SharedPreferences
     private SharedPreferences sharedPref = null;
 
@@ -68,15 +74,15 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer);
+        // get the music list of the musicListActivity
         musicList = musicList;
         getSupportActionBar().hide();
-
-
 
         // SharedPreferences
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         enableSensor = sharedPref.getBoolean("enableSensor", true);
-        // Initialisation du service du sensor
+
+        // Initialisation of sensor service
         root = findViewById(R.id.root);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
@@ -92,9 +98,9 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
 
         // Initialisation of the Activity
         initViews();
-
         getIntentMethod();
-        // Listener of Seekbar
+
+        // Listener of Seekbar - move the seekbar according to the music time
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -113,6 +119,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
 
             }
         });
+
         // Thread to move the Seekbar according to the music progress
         Musicplayer.this.runOnUiThread(new Runnable() {
             @Override
@@ -126,7 +133,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
             }
         });
 
-        // Listener du sensor
+        // Listener of the sensor - will change the theme depending the light received by the sensor
         lightEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -134,7 +141,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                     float value = event.values[0];
                     float limitSensor = maxValue / 3;
                     if (value < limitSensor) {
-                        // going to soft eye mod
+                        // going to dark theme
                         root.setBackgroundColor(0xff646767);
                         song_name.setTextColor(0xffffffff);
                         artist_name.setTextColor(0xffffffff);
@@ -143,6 +150,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                         backtoList.setColorFilter(0xffffffff);
 
                     } else {
+                        // going to the white theme
                         root.setBackgroundColor(0xffffffff);
                         song_name.setTextColor(0xff000000);
                         artist_name.setTextColor(0xff000000);
@@ -162,6 +170,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
 
     }
 
+    // transform the time given in integer to the time in M:S
     private String formattedTime(int currentPos) {
         String totalout = "";
         String totalNew = "";
@@ -177,6 +186,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         }
     }
 
+    // get the intent from the musiclistActivity
+    // start the service and get the data of the music
     private void getIntentMethod() {
         position = getIntent().getIntExtra("position", -1);
         Log.d(TAG, "getIntentMethod: Song picked is : " + position);
@@ -193,6 +204,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         startService(i);
     }
 
+    // gives to the variables the correct "view" depending their ID
     private void initViews() {
         song_name = findViewById(R.id.titleMusic);
         artist_name = findViewById(R.id.artist);
@@ -206,6 +218,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     }
 
     @Override
+    // Bind the service, register the sensor manager
+    // start the threads for the buttons
     protected void onResume() {
         Intent i = new Intent(this, PlayingService.class);
         bindService(i, this, BIND_AUTO_CREATE);
@@ -221,13 +235,18 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
 
 
     @Override
+    // Unbind the service to the activity and unregister the sensor manager
     protected void onPause() {
         super.onPause();
         unbindService(this);
         sensorManager.unregisterListener(lightEventListener);
     }
 
-    // Button Threads
+    /*
+        Buttons Threads
+     */
+
+    // Thread for the previous button
     private void prevThreadBtn() {
         previousThread = new Thread(){
             @Override
@@ -245,18 +264,24 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         previousThread.start();
     }
 
+    // Method to go to next music
     public void prevBtnClicked() {
+        // test if the player is playing
         if(musicSrv.isPlaying()){
             musicSrv.stop();
             musicSrv.release();
+            // decrement music position
             position = ((position-1) < 0 ? (musicList.size()-1) : (position-1) );
             uri = Uri.parse(musicList.get(position).getPosition());
             url = Uri.parse("file://"+musicList.get(position).getPosition());
+            // create the player with new music position
             musicSrv.createPlayer(position);
+            // get Music data & change texts of the player Activity
             metaData(uri);
             song_name.setText(musicList.get(position).getTitle());
             artist_name.setText(musicList.get(position).getArtist());
             seekbar.setMax(musicSrv.getDuration()/1000);
+            // Thread for seekbar
             Musicplayer.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -275,14 +300,17 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         else{
             musicSrv.stop();
             musicSrv.release();
+            // change music position
             position = ((position-1) < 0 ? (musicList.size()-1) : (position-1) );
             uri = Uri.parse(musicList.get(position).getPosition());
             url = Uri.parse("file://"+musicList.get(position).getPosition());
+            // create player and get music informations
             musicSrv.createPlayer(position);
             metaData(uri);
             song_name.setText(musicList.get(position).getTitle());
             artist_name.setText(musicList.get(position).getArtist());
             seekbar.setMax(musicSrv.getDuration()/1000);
+            // Thread for Seekbar
             Musicplayer.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -294,12 +322,12 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
                 }
             });
             musicSrv.onCompleted();
-            //showNotification(R.drawable.ic_baseline_play);
+            // change Image of PlayPauseButton to Pause
             playpause.setImageResource(R.drawable.play);
         }
     }
 
-
+    // Thread for the Play Button
     public void playThreadBtn() {
         playThread = new Thread(){
             @Override
@@ -317,10 +345,13 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         playThread.start();
     }
 
+    // Method to turn music on or off depending the current state
     public void playPauseBtnClicked() {
+        // test if the service is playing
         if(musicSrv.isPlaying()){
+            // turn image of button to play
             playpause.setImageResource(R.drawable.play);
-            //showNotification(R.drawable.ic_baseline_play);
+            // pause music
             musicSrv.pause();
             seekbar.setMax(musicSrv.getDuration()/1000);
             Musicplayer.this.runOnUiThread(new Runnable() {
@@ -335,7 +366,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
             });
         }
         else{
-            //showNotification(R.drawable.ic_pause_circle);
+            // start playing and change button to pause
             playpause.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24);
             musicSrv.start();
             seekbar.setMax(musicSrv.getDuration()/1000);
@@ -352,6 +383,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         }
     }
 
+    // Thread for nextButton
     public void nextThreadBtn() {
         nextThread = new Thread(){
             @Override
@@ -369,13 +401,17 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         nextThread.start();
     }
 
+    // Method to go to next music
     public void nextBtnClicked() {
+        // test if the service is playing music
         if(musicSrv.isPlaying()){
             musicSrv.stop();
             musicSrv.release();
+            // increase position
             position = ((position++) % musicList.size());
             uri = Uri.parse(musicList.get(position).getPosition());
             url = Uri.parse("file://"+musicList.get(position).getPosition());
+            // play music and get data
             musicSrv.createPlayer(position);
             metaData(uri);
             song_name.setText(musicList.get(position).getTitle());
@@ -424,7 +460,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     }
 
 
-
+    // method to get the title, duration and name of the music
     private void metaData(Uri uri){
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(uri.toString());
@@ -437,6 +473,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
 
 
     @Override
+    // Triggered When the service is connected
+    // set the texts on the player
     public void onServiceConnected(ComponentName name, IBinder service) {
 
         PlayingService.MyBinder binder = (PlayingService.MyBinder)service;
@@ -454,11 +492,14 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
     }
 
     @Override
+    // triggered when the service is disconnected
+    // destroy the service
     public void onServiceDisconnected(ComponentName name) {
         musicSrv = null;
         Log.d(TAG, "onServiceConnected: Service disonnected");
     }
 
+    // Method to go to MusicListActivity
     public void gotoList(View view){
         Intent i = new Intent(this, MusicListActivity.class);
         startActivity(i);

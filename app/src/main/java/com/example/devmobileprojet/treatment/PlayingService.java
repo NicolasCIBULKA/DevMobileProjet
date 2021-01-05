@@ -49,7 +49,10 @@ public class PlayingService extends Service implements MediaPlayer.OnCompletionL
     public void onCreate() {
         super.onCreate();
     }
+
     @Override
+    // Called when we click on an item of the ListView
+    // play the music on the position of the listview
     public int onStartCommand(Intent intent, int flags, int startId) {
         int myposition = intent.getIntExtra("servicePos", -1);
         if(myposition != -1){
@@ -77,6 +80,7 @@ public class PlayingService extends Service implements MediaPlayer.OnCompletionL
         }
     }
 
+    // Method to play music
     private void playMedia(int Startposition) {
         musicFiles = musicList;
         position = Startposition;
@@ -136,6 +140,8 @@ public class PlayingService extends Service implements MediaPlayer.OnCompletionL
     }
 
     @Override
+    // Called when the music has been fully played
+    // Go to next music
     public void onCompletion(MediaPlayer mp) {
         if(actionPlaying != null){
             actionPlaying.nextBtnClicked();

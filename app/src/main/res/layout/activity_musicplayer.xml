@@ -110,7 +110,7 @@
         android:id="@+id/gotoList"
         android:layout_width="37dp"
         android:layout_height="33dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:onClick="gotoList"
         app:layout_constraintEnd_toEndOf="parent"

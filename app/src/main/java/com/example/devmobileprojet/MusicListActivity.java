@@ -58,7 +58,9 @@ public class MusicListActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
+        /// get the sharedpref for the option
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        // automatic set of the sensor option if the data isnt in the sharedPreference
         if(!sharedPref.contains("enableSensor")){
             Log.d(TAG, "onCreate: creation of preference EnableSensor");
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -67,11 +69,14 @@ public class MusicListActivity extends AppCompatActivity  {
 
         }
         Log.d(TAG, "onCreate: Preference Sensor = " + sharedPref.getBoolean("enableSensor", false));
+        // creation of the MusicList datas
         musicView = (ListView)findViewById(R.id.song_list);// mettre l'id de la list du front
         musicList = new ArrayList<Music>();
         musicnamelist = new ArrayList<String>();
+        // test of the permissions
         permission();
         //getMusicList();
+        // sort music ordered by Name
         Collections.sort(
                 musicList, new Comparator<Music>() {
                     @Override
@@ -83,11 +88,12 @@ public class MusicListActivity extends AppCompatActivity  {
         Log.d(TAG, "onCreate: Music List Size =" + musicList.size());
         //MusicAdapter adapter = new MusicAdapter(this, musicList);
         //musicView.setAdapter(adapter);
+        // we use the adapter to put the music list in the listview
         musicView = findViewById(R.id.song_list);
         musicView.setAdapter(new ArrayAdapter<>(MusicListActivity.this, android.R.layout.simple_list_item_1, musicnamelist));
     }
 
-
+    // test the permissions
     private void permission(){
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED){
@@ -125,17 +131,13 @@ public class MusicListActivity extends AppCompatActivity  {
     @Override
     protected void onStop() {
         super.onStop();
-        /*
-        unbindService(musicConnection);
-        musicBound = false;
-        */
+
 
     }
 
 
     // Activated if a music is picked in the list
     public void songPicked(View view){
-        //musicSrv.setMusic(Integer.parseInt(view.getTag().toString()));
         int musicid = Integer.parseInt(view.getTag().toString());
         Music music = musicList.get(musicid);
         Log.d(TAG, "songPicked: id of the music : " + musicid);
@@ -147,12 +149,14 @@ public class MusicListActivity extends AppCompatActivity  {
     }
 
 
-
+    // Method to get all the musics from the storage
     public void getMusicList(){
         ContentResolver musicResolver = getContentResolver();
         Uri musicURI = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        // Cursor to search musics in the MusicURI
         Cursor musicCursor = musicResolver.query(musicURI, null,null,null,null);
         if (musicCursor != null ){
+            // get index of the elements we need
             int columnTitle = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int columnID = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int columnArtist = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
@@ -164,6 +168,7 @@ public class MusicListActivity extends AppCompatActivity  {
                 String currentTitle = musicCursor.getString(columnTitle);
                 String currentArtist = musicCursor.getString(columnArtist);
                 String currentPosition = musicCursor.getString(columnPosition);
+                // create new instance of music that we add in the musiclist
                 musicList.add(new Music(currentid, currentTitle, currentArtist, currentPosition, currentDuration));
                 musicnamelist.add(currentTitle);
             }

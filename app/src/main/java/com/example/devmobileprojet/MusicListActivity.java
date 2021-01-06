@@ -85,6 +85,14 @@ public class MusicListActivity extends AppCompatActivity  {
                     }
                 }
         );
+        Collections.sort(
+                musicnamelist, new Comparator<String>() {
+                    @Override
+                    public int compare(String a, String b) {
+                        return a.compareTo(b);
+                    }
+                }
+        );
         Log.d(TAG, "onCreate: Music List Size =" + musicList.size());
         //MusicAdapter adapter = new MusicAdapter(this, musicList);
         //musicView.setAdapter(adapter);

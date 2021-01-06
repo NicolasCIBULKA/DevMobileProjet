@@ -1,6 +1,7 @@
 package com.example.devmobileprojet;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -302,6 +304,7 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
             musicSrv.release();
             // change music position
             position = ((position-1) < 0 ? (musicList.size()-1) : (position-1) );
+
             uri = Uri.parse(musicList.get(position).getPosition());
             url = Uri.parse("file://"+musicList.get(position).getPosition());
             // create player and get music informations
@@ -407,8 +410,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         if(musicSrv.isPlaying()){
             musicSrv.stop();
             musicSrv.release();
-            // increase position
-            position = ((position++) % musicList.size());
+
+            position = ((position+1) == musicList.size() ? (0) : (position+1) );
             uri = Uri.parse(musicList.get(position).getPosition());
             url = Uri.parse("file://"+musicList.get(position).getPosition());
             // play music and get data
@@ -435,7 +438,8 @@ public class Musicplayer extends AppCompatActivity implements ActionPlaying, Ser
         else{
             musicSrv.stop();
             musicSrv.release();
-            position = ((position++) % musicList.size());
+            position = ((position+1) == musicList.size() ? (0) : (position+1) );
+
             uri = Uri.parse(musicList.get(position).getPosition());
             url = Uri.parse("file://"+musicList.get(position).getPosition());
             musicSrv.createPlayer(position);
